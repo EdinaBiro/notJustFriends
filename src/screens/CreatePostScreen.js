@@ -2,6 +2,9 @@ import {Text,View,StyleSheet,Image,TextInput,Button,KeyboardAvoidingView} from '
 import { useState } from 'react';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Platform } from 'react-native';
+import {Entypo} from '@expo/vector-icons';
+import * as ImagePicker from "expo-image-picker";
+
 
 const user = {
     id: "u1",
@@ -15,6 +18,7 @@ const user = {
 const CreatePostScreen = () => {
 
     const [description, setDescription] = useState("");
+    const [image,setImage] = useState(null);
 
     //const insets = useSafeAreaInsets();
 
@@ -23,6 +27,20 @@ const CreatePostScreen = () => {
         setDescription("");
     };
 
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+      
+        console.log(result);
+      
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+      };
 
     return (
         <KeyboardAvoidingView
@@ -32,9 +50,16 @@ const CreatePostScreen = () => {
         //keyboardVerticalOffset={150}
        >
             <View style={styles.header}>
-            <Image source={{uri: user.image}} style={styles.image} />
-            <Text>{user.name} </Text>
-        </View>
+            <Image source={{uri: user.image}} style={styles.profileImage} />
+            <Text style={styles.name}>{user.name}</Text>
+            <Entypo
+                onPress={pickImage}
+                name="images"
+                size={24}
+                color="limegreen"
+                style={styles.icon}
+            />
+            </View>
 
             <TextInput 
             value={description} 
@@ -42,6 +67,8 @@ const CreatePostScreen = () => {
             placeholder='What is on yor mind?' 
             multiline
             />
+
+        <Image source={{ uri: image}} style={styles.image} />
 
         <View style={styles.buttonConatiner}>
               <Button title="Post" onPress={onSubmit}/>
@@ -68,17 +95,26 @@ const styles = StyleSheet.create({
         marginBottom: 10,
 
     },
-    image:{
+    profileImage:{
         width:40,
         height:40,
         borderRadius:30,
         marginRight: 10,
-  },
+    },
     name:{
         fontWeight: "500",
     },
     buttonConatiner:{
         marginTop: "auto",
+
+    },
+    icon:{
+        marginLeft: "auto",
+    },
+    image:{
+        width: "100%",
+        aspectRatio: 4/3,
+        alignSelf: "center",
 
     }
 
